@@ -28,6 +28,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run fetch_details.py
+        run: python fetch_details.py
+        
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Build with Jekyll
