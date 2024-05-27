@@ -7,6 +7,7 @@ Welcome to my GitHub Pages site!
 I am exploring how to host a markdown page using GitHub Pages. This is a simple example.
 
 ## Projects
+- second_project
 - first_project
 - Autograder
 - Robustifying AVs
