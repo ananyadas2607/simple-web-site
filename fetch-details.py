@@ -3,7 +3,7 @@ import requests
 # Replace these with your actual Notion API key and database ID
 NOTION_API_KEY = 'secret_pBswAuQerH5m5IA6sJHL9GsMW64DZIfLsJBoTdlHYJy'
 DATABASE_ID = '4c07b2ef17f24d8fb7d4847ee9cf885f'
-MARKDOWN_FILE = 'index.md'
+MARKDOWN_FILE = 'index/index.md'
 
 def get_notion_database_content():
     url = f'https://api.notion.com/v1/databases/{DATABASE_ID}/query'
