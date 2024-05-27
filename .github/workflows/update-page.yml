@@ -32,34 +32,42 @@ jobs:
         from notion_client import Client
         import os
 
-        notion_token = os.getenv("NOTION_TOKEN")
-        database_id = os.getenv("DATABASE_ID")
+        def fetch_and_update_markdown():
+          # Set up the Notion client with the integration token
+          notion_token = os.getenv("NOTION_TOKEN")
+          database_id = os.getenv("DATABASE_ID")
+          notion = Client(auth=notion_token)
 
-        notion = Client(auth=notion_token)
+          # Query the database
+          response = notion.databases.query(database_id=database_id)
 
-        response = notion.databases.query(database_id=database_id)
+          # Extract project data
+          projects = []
+          for result in response["results"]:
+              project_name = result["properties"]["Name"]["title"][0]["text"]["content"]
+              project_url = result["url"]
+              projects.append(f"- [{project_name}]({project_url})")
 
-        projects = []
-        for result in response["results"]:
-            project_name = result["properties"]["Name"]["title"][0]["text"]["content"]
-            project_description = result["properties"]["Description"]["rich_text"][0]["text"]["content"]
-            projects.append(f"- {project_name}: {project_description}.\n")
+              # Update the markdown file
+            with open("index.md", "w") as file:
+                file.write("# My Markdown Page\n\n")
+                file.write("Welcome to my GitHub Pages site!\n\n")
+                file.write("## About Me\n\n")
+                file.write("I am exploring how to host a markdown page using GitHub Pages. This is a simple example.\n\n")
+                file.write("## Projects\n\n")
+                for project in projects:
+                    file.write(f"{project}\n")
+                file.write("\n## Contact\n\n")
+                file.write("You can reach me at [your-email@example.com](mailto:your-email@example.com).\n")
 
-        with open("index.md", "w") as file:
-            file.write("# My Markdown Page\n\n")
-            file.write("Welcome to my GitHub Pages site!\n\n")
-            file.write("## About Me\n\n")
-            file.write("I am exploring how to host a markdown page using GitHub Pages. This is a simple example.\n\n")
-            file.write("## Projects\n\n")
-            file.writelines(projects)
-            file.write("\n## Contact\n\n")
-            file.write("You can reach me at [your-email@example.com](mailto:your-email@example.com).\n")
+        if __name__ == "__main__":
+            fetch_and_update_markdown()
         EOF
-
+        
     - name: Commit changes
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
+        git config --local user.email "das.ananya2607@gmail.com"
+        git config --local user.name "ananyadas2607"
         git add .
         git commit -m "Update markdown page with Notion data"
         git push
