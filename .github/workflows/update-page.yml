@@ -1,0 +1,65 @@
+name: Update GitHub Pages
+
+on:
+  schedule:
+    - cron: '*/1 * * * *' # Runs every minute
+  push:
+    branches:
+      - main
+
+jobs:
+  update-markdown:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+
+    - name: Install dependencies
+      run: pip install notion-client
+
+    - name: Fetch data from Notion and update markdown
+      env:
+        NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        DATABASE_ID: ${{ secrets.DATABASE_ID }}
+      run: |
+        python - <<EOF
+        from notion_client import Client
+        import os
+
+        notion_token = os.getenv("NOTION_TOKEN")
+        database_id = os.getenv("DATABASE_ID")
+
+        notion = Client(auth=notion_token)
+
+        response = notion.databases.query(database_id=database_id)
+
+        projects = []
+        for result in response["results"]:
+            project_name = result["properties"]["Name"]["title"][0]["text"]["content"]
+            project_description = result["properties"]["Description"]["rich_text"][0]["text"]["content"]
+            projects.append(f"- {project_name}: {project_description}.\n")
+
+        with open("index.md", "w") as file:
+            file.write("# My Markdown Page\n\n")
+            file.write("Welcome to my GitHub Pages site!\n\n")
+            file.write("## About Me\n\n")
+            file.write("I am exploring how to host a markdown page using GitHub Pages. This is a simple example.\n\n")
+            file.write("## Projects\n\n")
+            file.writelines(projects)
+            file.write("\n## Contact\n\n")
+            file.write("You can reach me at [your-email@example.com](mailto:your-email@example.com).\n")
+        EOF
+
+    - name: Commit changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git commit -m "Update markdown page with Notion data"
+        git push
