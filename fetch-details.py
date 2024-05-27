@@ -58,6 +58,7 @@ if __name__ == '__main__':
     if database_content:
         project_names = extract_project_names(database_content)
         if project_names:
+            update_markdown_file(project_names, MARKDOWN_FILE)
             print("Project Names:")
             for name in project_names:
                 print(f"- {name}")
